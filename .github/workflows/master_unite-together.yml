@@ -66,4 +66,4 @@ jobs:
         with:
           app-name: 'unite-together'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_76ED48502F324F71B029C5F8701E1F99 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_5D975C60AC454644B64D452E9C57F294 }}
