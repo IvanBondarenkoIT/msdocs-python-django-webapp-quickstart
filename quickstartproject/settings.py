@@ -12,21 +12,31 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 
 import os
 from pathlib import Path
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
+
+# ALLOWED_HOSTS = [os.environ['WEBSITE_HOSTNAME']]
+# CSRF_TRUSTED_ORIGINS = ['https://' + os.environ['WEBSITE_HOSTNAME']]
+ALLOWED_HOSTS = ["*",
+                 ]
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
+# SECRET_KEY = config("SECRET_KEY")
 SECRET_KEY = '1234567890'
 
 # SECURITY WARNING: don't run with debug turned on in production!
+# DEBUG = config("DEBUG", cast=bool, default=True)
 DEBUG = True
-
-ALLOWED_HOSTS = []
+# USE REMOTE DB
+# USE_REMOTE_DB_SETTINGS = config("USE_REMOTE_DB_SETTINGS",cast=bool, default=False)
+USE_REMOTE_DB_SETTINGS = True
 
 
 # Application definition
@@ -78,12 +88,37 @@ WSGI_APPLICATION = 'quickstartproject.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+if 'RDS_DB_NAME' in os.environ:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.environ['RDS_DB_NAME'],
+            'USER': os.environ['RDS_USERNAME'],
+            'PASSWORD': os.environ['RDS_PASSWORD'],
+            'HOST': os.environ['RDS_HOSTNAME'],
+            'PORT': os.environ['RDS_PORT'],
+        }
     }
-}
+else:
+    if USE_REMOTE_DB_SETTINGS:
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.postgresql',
+                'NAME': config('RDS_DB_NAME'),
+                'USER': config('RDS_USERNAME'),
+                'PASSWORD': config('RDS_PASSWORD'),
+                'HOST': config('RDS_HOSTNAME'),
+                'PORT': config('RDS_PORT'),
+            }
+        }
+    else:
+        # Sqlit settings
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.sqlite3',
+                'NAME': BASE_DIR / 'db.sqlite3',
+            }
+        }
 
 
 # Password validation
